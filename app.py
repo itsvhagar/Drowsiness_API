@@ -16,33 +16,23 @@ class Drowsiness_Detection():
         ear = (A + B) / (2.0 * C)
         return ear
     def detect(self, file):
-    # Base64 encoded image data
         npimg = np.frombuffer(file, np.uint8)
         frame = cv2.imdecode(npimg, cv2.IMREAD_COLOR)
-        # Decode the Base64 image data
-        # img_data = base64.b64decode(code)
-        #
-        # # Convert the image data to a numpy array
-        # nparr = np.frombuffer(img_data, np.uint8)
-        #
-        # # Decode the numpy array to an image using cv2
-        # frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+        cv2.imwrite('image.jpg', frame)
 
         thresh = 0.25
         frame_check = 20
         detect = dlib.get_frontal_face_detector()
         predict = dlib.shape_predictor("models/shape_predictor_68_face_landmarks.dat")  # Dat file is the crux of the code
-
         (lStart, lEnd) = face_utils.FACIAL_LANDMARKS_68_IDXS["left_eye"]
         (rStart, rEnd) = face_utils.FACIAL_LANDMARKS_68_IDXS["right_eye"]
-        # cap = cv2.VideoCapture(0)
-        # frame = cv2.imread('test2.png')
         flag = 0
         while True:
-            # ret, frame = cap.read()
             frame = imutils.resize(frame, width=450)
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
             subjects = detect(gray, 0)
+            if len(subjects) == 0:
+                return 2
             for subject in subjects:
                 shape = predict(gray, subject)
                 shape = face_utils.shape_to_np(shape)  # converting to NumPy Array
@@ -63,14 +53,8 @@ class Drowsiness_Detection():
                                     cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
                         cv2.putText(frame, "****************ALERT!****************", (10, 325),
                                     cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
-                    # print ("Drowsy")
                     return False
                 else:
                     flag = 0
                     return True
-        #     cv2.imshow("Frame", frame)
-        #     key = cv2.waitKey(1) & 0xFF
-        #     if key == ord("q"):
-        #         break
-        # cv2.destroyAllWindows()
-        # # cap.release()
+

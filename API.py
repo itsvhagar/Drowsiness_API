@@ -9,10 +9,12 @@ model = Drowsiness_Detection()
 def predict():
     file = request.data
     prediction = model.detect(file)
-    if prediction:
+    if prediction == True:
         return jsonify(1)
-    else:
+    elif not prediction:
         return jsonify(0)
+    else:
+        return jsonify(2)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
